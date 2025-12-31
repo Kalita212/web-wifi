@@ -28,11 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (session?.user) {
           setUser(session.user);
-        } else {
-          await supabase.auth.signInWithPassword({
-            email: 'admin@demo.com',
-            password: 'Mandiri123',
-          });
         }
         setConnectionError(false);
       } catch (error) {

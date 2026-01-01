@@ -6,6 +6,7 @@ import { useCustomers } from '../../hooks/useCustomers';
 import { usePayments } from '../../hooks/usePayments';
 import { useExpenses } from '../../hooks/useExpenses';
 import { ChangePasswordModal } from './ChangePasswordModal';
+import { supabase } from '../../lib/supabase';
 import * as XLSX from 'xlsx';
 
 export function Settings() {
@@ -20,6 +21,8 @@ export function Settings() {
   const [saveMessage, setSaveMessage] = useState('');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
 
   React.useEffect(() => {
     if (settings) {
@@ -113,15 +116,45 @@ export function Settings() {
   };
 
   const handleResetData = async () => {
-    const confirmText = prompt('Ketik "RESET" untuk menghapus semua data:');
-
-    if (confirmText !== 'RESET') {
-      alert('Pembatalan reset data.');
+    if (!user || resetConfirmText !== 'RESET') {
+      alert('Ketik "RESET" untuk konfirmasi penghapusan data.');
       return;
     }
 
-    alert('Fitur reset data sedang dalam pengembangan. Data Anda aman.');
-    setShowResetConfirm(false);
+    setIsResetting(true);
+
+    try {
+      const { error: paymentsError } = await supabase
+        .from('payments')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (paymentsError) throw paymentsError;
+
+      const { error: customersError } = await supabase
+        .from('customers')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (customersError) throw customersError;
+
+      const { error: expensesError } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (expensesError) throw expensesError;
+
+      alert('Semua data berhasil dihapus! Halaman akan dimuat ulang.');
+      setResetConfirmText('');
+      setShowResetConfirm(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      alert('Gagal menghapus data. Silakan coba lagi.');
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   if (settingsLoading) {
@@ -292,22 +325,40 @@ export function Settings() {
               <AlertTriangle className="w-6 h-6" />
               <h3 className="text-xl font-semibold">Peringatan!</h3>
             </div>
-            <p className="text-gray-700 mb-6">
+            <p className="text-gray-700 mb-4">
               Tindakan ini akan menghapus SEMUA data termasuk pelanggan, pembayaran, dan pengeluaran.
               Tindakan ini tidak dapat dibatalkan!
             </p>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ketik <span className="font-bold text-red-600">RESET</span> untuk konfirmasi:
+              </label>
+              <input
+                type="text"
+                value={resetConfirmText}
+                onChange={(e) => setResetConfirmText(e.target.value)}
+                placeholder="RESET"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                disabled={isResetting}
+              />
+            </div>
             <div className="flex gap-3">
               <button
-                onClick={() => setShowResetConfirm(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-50"
+                onClick={() => {
+                  setShowResetConfirm(false);
+                  setResetConfirmText('');
+                }}
+                disabled={isResetting}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
               <button
                 onClick={handleResetData}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700"
+                disabled={isResetting || resetConfirmText !== 'RESET'}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Lanjutkan Reset
+                {isResetting ? 'Menghapus...' : 'Lanjutkan Reset'}
               </button>
             </div>
           </div>

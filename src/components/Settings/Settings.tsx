@@ -124,24 +124,27 @@ export function Settings() {
     setIsResetting(true);
 
     try {
+      // Delete all payments first (due to foreign key constraints)
       const { error: paymentsError } = await supabase
         .from('payments')
         .delete()
-        .eq('user_id', user.id);
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (paymentsError) throw paymentsError;
 
+      // Delete all customers
       const { error: customersError } = await supabase
         .from('customers')
         .delete()
-        .eq('user_id', user.id);
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (customersError) throw customersError;
 
+      // Delete all expenses (modal_wifi table)
       const { error: expensesError } = await supabase
-        .from('expenses')
+        .from('modal_wifi')
         .delete()
-        .eq('user_id', user.id);
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (expensesError) throw expensesError;
 

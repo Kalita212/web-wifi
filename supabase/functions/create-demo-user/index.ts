@@ -31,7 +31,7 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const email = "admin@gmail.com";
+    const email = "hanzocool30@gmail.com";
     const password = "Mandiri123";
 
     const { data: existingUser } = await supabase.auth.admin.listUsers();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, Phone, MapPin, Wifi, Calendar } from 'lucide-react';
+import { X, User, Phone, MapPin, Wifi, Calendar, DollarSign } from 'lucide-react';
 import { Customer } from '../../types';
 import { format } from 'date-fns';
 
@@ -62,6 +62,14 @@ export function CustomerDetailModal({ isOpen, onClose, customer }: CustomerDetai
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                     {customer.paket}
                   </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <DollarSign className="w-5 h-5 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Nominal Pembayaran</p>
+                  <p className="text-gray-900 font-medium">Rp {(customer.nominal || 0).toLocaleString('id-ID')}</p>
                 </div>
               </div>
 

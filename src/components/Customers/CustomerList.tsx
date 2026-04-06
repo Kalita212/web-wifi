@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Eye, Users, RefreshCw } from 'lucide-react';
+import { Plus, Search, CreditCard as Edit, Trash2, Eye, Users, RefreshCw } from 'lucide-react';
 import { useCustomers } from '../../hooks/useCustomers';
 import { AddCustomerModal } from './AddCustomerModal';
 import { EditCustomerModal } from './EditCustomerModal';
@@ -122,6 +122,9 @@ export function CustomerList() {
                   Paket
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Nominal
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tgl Bayar
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -151,6 +154,11 @@ export function CustomerList() {
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {customer.paket}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-gray-900 font-medium">
+                      Rp {(customer.nominal || 0).toLocaleString('id-ID')}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-gray-900">

@@ -8,13 +8,6 @@ interface AddPaymentModalProps {
   onClose: () => void;
 }
 
-const PAKET_PRICING: Record<string, number> = {
-  'Paket Basic': 100000,
-  'Paket Premium': 150000,
-  'Paket Enterprise': 250000,
-  'Paket Reguler': 120000,
-  'Paket Pro': 180000,
-};
 
 export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
   const { addPayment } = usePayments();
@@ -68,7 +61,7 @@ export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
         const customersToAdd = selectedCustomerObjects;
 
         for (const customer of customersToAdd) {
-          const nominal = PAKET_PRICING[customer.paket] || parseFloat(formData.nominal);
+          const nominal = customer.nominal || 0;
 
           const result = await addPayment({
             pelanggan_id: customer.id,
@@ -98,7 +91,7 @@ export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
         onClose();
       } else if (formData.pelanggan_id) {
         const customer = customers.find(c => c.id === formData.pelanggan_id);
-        const nominal = customer ? (PAKET_PRICING[customer.paket] || parseFloat(formData.nominal)) : parseFloat(formData.nominal);
+        const nominal = customer ? (customer.nominal || parseFloat(formData.nominal)) : parseFloat(formData.nominal);
 
         const result = await addPayment({
           ...formData,
@@ -129,7 +122,7 @@ export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
 
   const getCustomerNominal = (customerId: string) => {
     const customer = customers.find(c => c.id === customerId);
-    return customer ? PAKET_PRICING[customer.paket] || 0 : 0;
+    return customer ? customer.nominal || 0 : 0;
   };
 
   if (!isOpen) return null;
@@ -177,7 +170,7 @@ export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
                   <div key={customer.id} className="flex items-center justify-between bg-white p-2 rounded border border-blue-200">
                     <span className="text-sm text-gray-700">{customer.nama}</span>
                     <span className="text-xs font-medium text-gray-500">
-                      Rp {(PAKET_PRICING[customer.paket] || 0).toLocaleString('id-ID')}
+                      Rp {(customer.nominal || 0).toLocaleString('id-ID')}
                     </span>
                   </div>
                 ))}
@@ -225,7 +218,7 @@ export function AddPaymentModal({ isOpen, onClose }: AddPaymentModalProps) {
                       />
                       <span className="ml-2 text-sm text-gray-700 flex-1">{customer.nama}</span>
                       <span className="text-xs text-gray-500">
-                        {PAKET_PRICING[customer.paket] ? `Rp ${PAKET_PRICING[customer.paket].toLocaleString('id-ID')}` : 'Paket Tidak Terdaftar'}
+                        {customer.nominal ? `Rp ${customer.nominal.toLocaleString('id-ID')}` : 'Nominal Tidak Terdaftar'}
                       </span>
                     </label>
                   ))}

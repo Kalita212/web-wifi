@@ -4,6 +4,7 @@ export interface Customer {
   alamat: string;
   no_hp: string;
   paket: string;
+  nominal: number;
   tgl_registrasi: string;
   tanggal_bayar_biasa: number;
   catatan_pembayaran: string;
